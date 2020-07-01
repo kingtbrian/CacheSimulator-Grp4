@@ -90,39 +90,38 @@ public class Cache {
 	
 	public void calculateImplementationSize() {
 		this.setImplementationSizeKBytes( 
-				(this.cacheSizeKBytes * 2^10) + this.overheadSizeBytes
+				(this.cacheSizeKBytes * (int)(Math.pow(2, 10))) + this.overheadSizeBytes
 				);
 	}
 	
 	public void calculateOverheadSize() {
 		this.setOverheadSizeBytes( 
-				(this.associativity * (this.tagSizeBits + 1)) /
-				(this.numBlocks * 8)
+				((this.tagSizeBits + 1)) * (this.numBlocks / 8)
 				);
 	}
 	
 	public void calculateNumRows() {
 		this.setTotalRows(
-				(this.cacheSizeKBytes * 2^10) / (this.blockSizeBytes * this.associativity)
+				(this.cacheSizeKBytes * (int)(Math.pow(2, 10))) / (this.blockSizeBytes * this.associativity)
 				);
 	}
 	
 	public void calculateNumBlocks() {
 		this.setNumBlocks(
-				(this.cacheSizeKBytes * (2^10)) / this.blockSizeBytes
+				(this.cacheSizeKBytes * (int)(Math.pow(2, 10))) / this.blockSizeBytes
 				);
 	}
 	
 	public void calculateIndex() {
 		this.setIndexSizeBits(
-				(int)Math.log( (this.cacheSizeKBytes * 2^10) /
-							   (this.blockSizeBytes * this.associativity))
-				);
+				(int)(Math.log((this.cacheSizeKBytes * Math.pow(2, 10)) / (this.blockSizeBytes * this.associativity)) /
+					  Math.log(2)
+				));	
 	}
 	
 	public void calculateTagSize() {
 		this.setTagSizeBits(
-				32 - this.indexSizeBits - (int)Math.log(this.blockSizeBytes)
+				32 - this.indexSizeBits - (int)((Math.log(this.blockSizeBytes))/Math.log(2))
 				);
 	}
 	
