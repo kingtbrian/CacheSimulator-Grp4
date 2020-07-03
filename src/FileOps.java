@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class FileOps {
 	private String args[];
@@ -41,7 +38,6 @@ public class FileOps {
 					idx++;
 					break;
 				default:
-					System.out.println("staying in default");
 					idx++;
 					break;
 			}
@@ -53,7 +49,7 @@ public class FileOps {
 
 	/*  *****    PLACE HOLDER ****
 	// need to create an instruction class
-	public List<Instructions> loadPersonnel() {
+	public List<Instructions> loadInstructions() {
 		List<Instructions> instructionSet = new List<Instructions>();
 		BufferedReader reader = null;
 		String line;

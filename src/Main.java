@@ -3,17 +3,19 @@
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		
 		FileOps fileOps = new FileOps(args);
 		Cache cache = fileOps.argParseCacheConstructor();
-		System.out.println(cache.toString());
+		
+		// Milestone #1
+		printSimulationParameters(cache, fileOps);
 		
 	}
 	
-	public Cache argparse() {
-		return new Cache();
+	public static void printSimulationParameters(Cache cache, FileOps fileOps)
+	{
+		System.out.println("Cache Simulator CS3853 Summer 2020 - Group #04\n");
+		System.out.println("Trace File: " + fileOps.getTraceFileName() + "\n");
+		System.out.println(cache.toString());
 	}
 
 
