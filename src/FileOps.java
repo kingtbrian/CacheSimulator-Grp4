@@ -1,17 +1,57 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FileOps {
+	private String params[];
 	private String traceFileName;
 	
+	public FileOps(String args[]) {
+		this.params = args;
+	}
 	
-	public FileOps(String traceFileName) {
-		this.setTraceFileName(traceFileName);
+	public Cache argParseCacheConstructor() 
+	{
+		int idx = 0;
+		int cacheSize = Integer.MIN_VALUE;
+		int blockSize = Integer.MIN_VALUE;
+		int associativity = Integer.MIN_VALUE;
+		String rPolicy = null;
+
+		String args[] = new String[] {"-f", "trace1.trc", "-s",
+									"512", "-b", "16", "-a", "8", 
+									"-r", "rnd"};
+		while (idx < args.length) {
+			switch(args[idx]) {
+				case "-f":
+					this.traceFileName = args[++idx];
+					idx++;
+					break;
+				case "-s":
+					cacheSize = Integer.parseInt(args[++idx]);
+					idx++;
+					break;
+				case "-b":
+					blockSize = Integer.parseInt(args[++idx]);
+					idx++;
+					break;
+				case "-a":
+					associativity = Integer.parseInt(args[++idx]);
+					idx++;
+					break;
+				case "-r":
+					rPolicy = args[++idx];
+					idx++;
+					break;
+				default:
+					System.out.println("staying in default");
+					idx++;
+					break;
+			}
+		}
+		
+		Cache cache = new Cache(cacheSize, blockSize, associativity, rPolicy);
+		return cache;
 	}
 
 	/*  *****    PLACE HOLDER ****

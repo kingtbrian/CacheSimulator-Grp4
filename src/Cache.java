@@ -41,29 +41,29 @@ public class Cache {
 		String v; 
 		StringBuilder sb = new StringBuilder();
 		sb.append("***** Cache Input Parameters *****\n");
-		v = String.format("%-25s", "Cache Size:");
+		v = String.format("%-30s", "Cache Size:");
 		sb.append(v + this.getCacheSizeKBytes() + "\n");
-		v = String.format("%-25s", "Block Size:");
+		v = String.format("%-30s", "Block Size:");
 		sb.append(v + this.getBlockSizeBytes() + "\n");
-		v = String.format("%-25s", "Associativity:");
+		v = String.format("%-30s", "Associativity:");
 		sb.append(v + this.getAssociativity() + "\n");
-		v = String.format("%-25s", "Replacement Policy:");
+		v = String.format("%-30s", "Replacement Policy:");
 		sb.append(v + this.getReplacementPolicy() + "\n\n\n");
 		
 		sb.append("***** Cache Calculated Values *****\n");
-		v = String.format("%-25s", "Total # Blocks:");
+		v = String.format("%-30s", "Total # Blocks:");
 		sb.append(v + this.getNumBlocks() + "\n");
-		v = String.format("%-25s", "Tag Size:");
+		v = String.format("%-30s", "Tag Size:");
 		sb.append(v + this.getTagSizeBits() + "\n");
-		v = String.format("%-25s", "Index Size:");
+		v = String.format("%-30s", "Index Size:");
 		sb.append(v + this.getIndexSizeBits() + "\n");
-		v = String.format("%-25s", "Total # Rows:");
+		v = String.format("%-30s", "Total # Rows:");
 		sb.append(v + this.getTotalRows() + "\n");
-		v = String.format("%-25s", "Overhead Size:");
+		v = String.format("%-30s", "Overhead Size:");
 		sb.append(v + this.getOverheadSizeBytes() + "\n");
-		v = String.format("%-25s", "Implementation Size:");
-		sb.append(v + this.getImplementationSizeKBytes() + "\n");
-		v = String.format("%-25s", "Cost:");
+		v = String.format("%-30s", "Implementation Size:");
+		sb.append(v + this.getKb(this.getImplementationSizeKBytes()) + " KB   (" + this.getImplementationSizeKBytes() +" bytes)"+ "\n");
+		v = String.format("%-30s", "Cost:");
 		sb.append(v);
 		v = String.format("%.2f", this.getCost());
 		sb.append("$" + v + "\n");
@@ -82,9 +82,13 @@ public class Cache {
 		this.calculateCost();
 	}
 	
+	public int getKb(int n) {
+		return (int)(n / (Math.pow(2, 10)) );
+	}
+	
 	public void calculateCost() {
 		this.setCost(
-				.07 * this.cacheSizeKBytes
+				.07 * this.implementationSizeKBytes/(int)(Math.pow(2, 10))
 				);
 	}
 	
