@@ -3,11 +3,11 @@ import java.util.List;
 
 
 public class FileOps {
-	private String params[];
+	private String args[];
 	private String traceFileName;
 	
 	public FileOps(String args[]) {
-		this.params = args;
+		this.args = args;
 	}
 	
 	public Cache argParseCacheConstructor() 
@@ -18,9 +18,6 @@ public class FileOps {
 		int associativity = Integer.MIN_VALUE;
 		String rPolicy = null;
 
-		String args[] = new String[] {"-f", "trace1.trc", "-s",
-									"512", "-b", "16", "-a", "8", 
-									"-r", "rnd"};
 		while (idx < args.length) {
 			switch(args[idx]) {
 				case "-f":
