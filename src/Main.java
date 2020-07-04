@@ -2,12 +2,25 @@
 
 public class Main {
 
+	
 	public static void main(String[] args) {
-		FileOps fileOps = new FileOps(args);
-		Cache cache = fileOps.argParseCacheConstructor();
 		
+		String testParams[] = new String[] {
+				"-f", "TinyTrace.trc",
+				"-s", "512",
+				"-b", "16",
+				"-a", "8",
+				"-r", "rnd"
+		};
+		
+		
+		FileOps fileOps = new FileOps(testParams);
+		Cache cache = fileOps.argParseCacheConstructor();
 		// Milestone #1
 		printSimulationParameters(cache, fileOps);
+		
+		CacheSim cacheSim = new CacheSim(cache, fileOps.loadInstructions());
+		System.out.println(cacheSim.getInstructions());
 		
 	}
 	

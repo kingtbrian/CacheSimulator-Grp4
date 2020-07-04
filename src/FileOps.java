@@ -1,3 +1,10 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class FileOps {
 	private String args[];
@@ -47,20 +54,30 @@ public class FileOps {
 		return cache;
 	}
 
-	/*  *****    PLACE HOLDER ****
-	// need to create an instruction class
-	public List<Instructions> loadInstructions() {
-		List<Instructions> instructionSet = new List<Instructions>();
+	public Queue<Instruction> loadInstructions() {
+		Queue<Instruction> instructionSet = new LinkedList<Instruction>();
 		BufferedReader reader = null;
+		String filePath = "src/Files/" + traceFileName;
 		String line;
-
+		int length;
+		String address, writeDest, readDest;
+		
 		try {
-			reader = new BufferedReader(new FileReader(traceFileName));
+			reader = new BufferedReader(new FileReader(filePath));
 			while ((line = reader.readLine()) != null) {
+				address = writeDest = readDest = null;
 				
-				// read line from file, parse line, create new instruction and
-				// load into instruction (list, queue, heap)? 
-				 
+				length = Integer.parseInt(line.substring(5, 7));
+				address = line.substring(10, 18);
+				
+				line = reader.readLine();
+				if (line != null) {
+					writeDest = line.substring(6, 14);
+					readDest = line.substring(33, 41);
+				} 
+				
+				instructionSet.add(new Instruction(length, address, writeDest, readDest));
+				line = reader.readLine();
 			}
 
 		} catch (FileNotFoundException e) {
@@ -76,9 +93,9 @@ public class FileOps {
 				}
 			}
 		}
+		
 		return instructionSet;
 	}
-	*/
 	
 	public void setTraceFileName(String traceFileName) {
 		this.traceFileName = traceFileName;
