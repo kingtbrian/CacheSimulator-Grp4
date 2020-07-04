@@ -108,7 +108,7 @@ public class FileOps {
 			String outputFileName = directory + "/Team_04_Sim_" + ++fileCount + "_M#1.txt";
 			
 			
-			FileWriter deptWriter = new FileWriter(new File(outputFileName));
+			FileWriter simWriter = new FileWriter(new File(outputFileName));
 			StringBuilder sb = new StringBuilder();
 			
 			sb.append("Cache Simulator CS3853 Summer 2020 - Group #04\n\n");
@@ -121,8 +121,8 @@ public class FileOps {
 			            });
 						
 			
-			deptWriter.write(sb.toString());
-			deptWriter.close();
+			simWriter.write(sb.toString());
+			simWriter.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
