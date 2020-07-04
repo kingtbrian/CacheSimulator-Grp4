@@ -2,9 +2,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
+
 
 public class FileOps {
 	private String args[];
@@ -95,6 +97,36 @@ public class FileOps {
 		}
 		
 		return instructionSet;
+	}
+	
+	public void saveSimulation(Cache cache, Queue<Instruction> instructions) {
+		try {
+			
+			File directory = new File("src/OutputFiles");
+			int fileCount = directory.list().length;
+			
+			String outputFileName = directory + "/Team_04_Sim_" + ++fileCount + "_M#1.txt";
+			
+			
+			FileWriter deptWriter = new FileWriter(new File(outputFileName));
+			StringBuilder sb = new StringBuilder();
+			
+			sb.append("Cache Simulator CS3853 Summer 2020 - Group #04\n\n");
+			sb.append("Trace File: " + this.traceFileName + "\n\n");
+			sb.append(cache.toString() + "\n\n");
+			
+			instructions.stream()
+			            .forEach(instruction -> {
+			            	sb.append(instruction.toString() + "\n");
+			            });
+						
+			
+			deptWriter.write(sb.toString());
+			deptWriter.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void setTraceFileName(String traceFileName) {
