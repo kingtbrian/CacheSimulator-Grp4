@@ -18,7 +18,7 @@ public class Instruction {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("0x" + this.address + ": (" + this.readLength + ")" );
+		sb.append("0x" + this.address.toUpperCase() + ": (" + this.readLength + ")" );
 		return sb.toString();
 	}
 	
@@ -29,8 +29,6 @@ public class Instruction {
 		sb.append("\tRead Destination:  " + this.getReadDest());
 		return sb.toString();
 	}
-	
-	
 	
 	public int getReadLength() {
 		return readLength;

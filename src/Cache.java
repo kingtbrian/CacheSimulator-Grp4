@@ -62,7 +62,7 @@ public class Cache {
 		v = String.format("%-30s", "Overhead Size:");
 		sb.append(v + this.getOverheadSizeBytes() + "\n");
 		v = String.format("%-30s", "Implementation Size:");
-		sb.append(v + this.getKb(this.getImplementationSizeKBytes()) + " KB   (" + this.getImplementationSizeKBytes() +" bytes)"+ "\n");
+		sb.append(v + this.getKb(this.getImplementationSizeKBytes()) + ".00 KB   (" + this.getImplementationSizeKBytes() +" bytes)"+ "\n");
 		v = String.format("%-30s", "Cost:");
 		sb.append(v);
 		v = String.format("%.2f", this.getCost());
