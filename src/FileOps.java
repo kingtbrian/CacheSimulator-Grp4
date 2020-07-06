@@ -11,6 +11,7 @@ import java.util.Queue;
 public class FileOps {
 	private String args[];
 	private String traceFileName;
+	private int addrCount;
 	
 	public FileOps(String args[]) {
 		this.args = args;
@@ -102,7 +103,12 @@ public class FileOps {
 	public void saveSimulation(Cache cache, Queue<Instruction> instructions) {
 		try {
 			
-			File directory = new File("src/OutputFiles");
+			
+			File directory = new File("OutputFiles");
+			if (!directory.exists()) {
+				directory.mkdir();
+			}
+			
 			int fileCount = directory.list().length;
 			
 			String outputFileName = directory + "/Team_04_Sim_" + ++fileCount + "_M#1.txt";
@@ -117,7 +123,10 @@ public class FileOps {
 			
 			instructions.stream()
 			            .forEach(instruction -> {
-			            	sb.append(instruction.toString() + "\n");
+			            	if (addrCount < 20)
+			            		sb.append(instruction.toString() + "\n");
+			            	
+			            	addrCount++;
 			            });
 						
 			
@@ -127,6 +136,7 @@ public class FileOps {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		addrCount = 0;
 	}
 	
 	public void setTraceFileName(String traceFileName) {
