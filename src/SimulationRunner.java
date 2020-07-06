@@ -1,11 +1,11 @@
 import java.util.Queue;
 
-public class CacheSim {
+public class SimulationRunner {
 	private Cache cache;
 	private Queue<Instruction> instructions;
 	
 	
-	public CacheSim(Cache cache, Queue<Instruction> instructions) {
+	public SimulationRunner(Cache cache, Queue<Instruction> instructions) {
 		this.setCache(cache);
 		this.setInstructions(instructions);
 	}
