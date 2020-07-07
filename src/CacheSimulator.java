@@ -11,8 +11,7 @@ public class CacheSimulator {
 		
 		// Milestone #1
 		SimulationRunner cacheSim = new SimulationRunner(cache, fileOps.loadInstructions());
-		fileOps.saveSimulation(cache, cacheSim.getInstructions());
-		
+		fileOps.printCacheSimToConsole(cache, cacheSim.getInstructions());
 	}
 	
 

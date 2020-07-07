@@ -100,9 +100,23 @@ public class FileOps {
 		return instructionSet;
 	}
 	
+	public void printCacheSimToConsole(Cache cache, Queue<Instruction> instructions) {
+		System.out.println("Cache Simulator CS3853 Summer 2020 - Group #04\n\n");
+		System.out.println("Trace File: " + this.traceFileName + "\n\n");
+		System.out.println(cache.toString() + "\n\n");
+		
+		StringBuilder sb = new StringBuilder();
+		instructions.stream()
+		            .forEach(instruction -> {
+		            	if (addrCount < 20)
+		            		sb.append(instruction.toString() + "\n");
+		            	addrCount++;
+		            });
+		System.out.println(sb.toString());
+	}
+	
 	public void saveSimulation(Cache cache, Queue<Instruction> instructions) {
 		try {
-			
 			
 			File directory = new File("OutputFiles");
 			if (!directory.exists()) {
