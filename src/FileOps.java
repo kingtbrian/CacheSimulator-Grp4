@@ -60,7 +60,7 @@ public class FileOps {
 	public Queue<Instruction> loadInstructions() {
 		Queue<Instruction> instructionSet = new LinkedList<Instruction>();
 		BufferedReader reader = null;
-		String filePath = "src/Files/" + traceFileName;
+		String filePath = traceFileName;
 		String line;
 		int length;
 		String address, writeDest, readDest;
@@ -118,14 +118,16 @@ public class FileOps {
 	public void saveSimulation(Cache cache, Queue<Instruction> instructions) {
 		try {
 			
-			File directory = new File("OutputFiles");
-			if (!directory.exists()) {
-				directory.mkdir();
+			File directory = new File(new File(".").getAbsolutePath());
+			String l[] = directory.list();
+			int fileCount = 0;
+			for(String word : l) {
+				if (word.contains("M#1.txt")) {
+					fileCount++;
+				}
 			}
 			
-			int fileCount = directory.list().length;
-			
-			String outputFileName = directory + "/Team_04_Sim_" + ++fileCount + "_M#1.txt";
+			String outputFileName = "Team_04_Sim_" + ++fileCount + "_M#1.txt";
 			
 			
 			FileWriter simWriter = new FileWriter(new File(outputFileName));
@@ -135,14 +137,22 @@ public class FileOps {
 			sb.append("Trace File: " + this.traceFileName + "\n\n");
 			sb.append(cache.toString() + "\n\n");
 			
+			/*
+			for(Instruction i : instructions) {
+				if (addrCount < 20) {
+            		sb.append(i.toString() + "\n");
+				}
+				addrCount++;
+			}
+			*/
+			
 			instructions.stream()
-			            .forEach(instruction -> {
-			            	if (addrCount < 20)
-			            		sb.append(instruction.toString() + "\n");
-			            	
-			            	addrCount++;
-			            });
-						
+            	.forEach(instruction -> {
+            		if (addrCount < 20) {
+            			sb.append(instruction.toString() + "\n");
+            		}
+            		addrCount++;
+            });
 			
 			simWriter.write(sb.toString());
 			simWriter.close();
