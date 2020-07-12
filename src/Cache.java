@@ -14,6 +14,7 @@ public class Cache {
 	private int hits;
 	private int compulsoryMiss;
 	private int conflictMiss;
+	private int cycles;
 	private double hitRate;
 	private double missRate;
 	private double cyclesPerInstruction;
@@ -265,5 +266,12 @@ public class Cache {
 		this.unusedBlocks = unusedBlocks;
 	}
 	
+	public int getCycles() {
+		return cycles;
+	}
+
+	public void setCycles(int cycles) {
+		this.cycles = cycles;
+	}
 	
 }
