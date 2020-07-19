@@ -21,6 +21,7 @@ public class SimulationRunner {
 		this.setInstructions(instructions);
 		this.setInstructionCount(instructions.size());
 		this.setMemory();
+		this.cache.setInstructionCount(this.instructionCount);
 	}
 
 	
@@ -28,6 +29,7 @@ public class SimulationRunner {
 	public void runSimulation()
 	{
 		int addr[][] = new int[3][4];
+		
 		
 		while (!this.instructions.isEmpty()) 
 		{
@@ -46,7 +48,6 @@ public class SimulationRunner {
 			addr[SRC][BYTE] = instruction.getOffsetOfAddress(cache, instruction.getReadDest());
 			addr[SRC][HIT] = 0;
 			
-			
 			this.simDataAccess(addr[EIP], instruction, instruction.getReadLength());
 			
 			if (addr[DST][TAG] != 0 && addr[DST][ROW] !=0)
@@ -61,24 +62,33 @@ public class SimulationRunner {
 	public void simDataAccess(int i[], Instruction instruction, int bytesOfOperation)
 	{
 		int availableBlock = -1; 
-		int totalNumRowAccesses = (bytesOfOperation + i[BYTE]) / cache.getBlockSizeBytes();
-		System.out.println("totalNumRowAccesses" + totalNumRowAccesses);
-		
-		for (int cacheRow = i[ROW]; cacheRow < totalNumRowAccesses + cacheRow; cacheRow++)
+		int totalNumRowAccesses = ((bytesOfOperation + i[BYTE]) / cache.getBlockSizeBytes()) + 1;
+
+		for (int rowAccesses = i[ROW]; rowAccesses < (totalNumRowAccesses + i[ROW]); rowAccesses++)
 		{
+			int cacheRow = rowAccesses;
+			// ensure wrap around to beginning of cache if needed
+			if (cacheRow == cache.getTotalRows())
+			{
+				cacheRow = 0;
+			}
+			
 			for (int block = 0; block < cache.getAssociativity(); block++)
 			{
 				if(memory[cacheRow][block] == -1) {
 					availableBlock = block;
 				}
-				
 				// Cache Hit 
 				if (memory[cacheRow][block] == i[TAG])
 				{
 					// 1 for hit, 2 for instruction
-					i[HIT] = 1;
-					cache.setHits(cache.getHits() + 3);
-					this.updateMemoryTracker(block, cacheRow);
+					i[HIT] = 1;	
+					cache.setHits(cache.getHits() + 1);
+					cache.setCycles(cache.getCycles() + 3);
+					if (cache.getReplacementPolicy().equalsIgnoreCase("Least Recently Used"))
+					{
+						this.updateLRUTracker(block, cacheRow);
+					}
 					break;
 				}
 			}		
@@ -89,35 +99,51 @@ public class SimulationRunner {
 				{
 					memory[cacheRow][availableBlock] = i[TAG];
 					// 4 * number reads needed + 2 for instruction
-					cache.setCompulsoryMiss(cache.getCompulsoryMiss() + 
-							(4 * this.getNumberOfReads()) + 2);
+					cache.setCompulsoryMiss(cache.getCompulsoryMiss() + 1);
+					cache.setCycles(cache.getCycles() + (4 * this.getNumberOfReads()) + 2);
 				} 
 				else 
 				{
-					cache.setConflictMiss(cache.getConflictMiss() + 
-							(4 * this.getNumberOfReads()) + 2);
+					cache.setConflictMiss(cache.getConflictMiss() + 1);
+					cache.setCycles(cache.getCycles() + (4 * this.getNumberOfReads()) + 2);
 					int replaceBlock = getReplacementBlock(cacheRow);
 					memory[cacheRow][replaceBlock] = i[TAG];
 				}
 			}
-
 			// account for new byte offset after operation
 			// unneeded if there are no wraps
 			i[BYTE] = (i[BYTE] + bytesOfOperation) % cache.getBlockSizeBytes();
 				
 			availableBlock = -1; 
 		}
+		this.cache.setUnusedBlocks(this.findUnusedBlocks());
+		this.cache.calculateCacheMetrics();
 	}
 		
+	public int findUnusedBlocks()
+	{
+		int n = 0;
+		for (int i = 0; i < this.cache.getTotalRows(); i++)
+		{
+			for (int j = 0; j < this.cache.getAssociativity(); j++) 
+			{
+				if (this.memory[i][j] == -1)
+					{
+						n++;
+					}
+			}
+		}
+		return n;
+	}
 	public int getNumberOfReads() {
 		return (int)Math.ceil(cache.getBlockSizeBytes()/4);
 	}
 	
 	//used for LRU replacement policy
-	public void updateMemoryTracker(int block, int row)
+	public void updateLRUTracker(int block, int row)
 	{
 		int recentlyUsed = block;
-		int index = 0; 
+		int index = -1; 
 
 		for (int i = 0; i < this.cache.getAssociativity() - 1; i++)
 		{
@@ -126,11 +152,12 @@ public class SimulationRunner {
 				index = i;
 			}
 		}
-		
-		for (int i = index; i > 1; i++)
+
+		for (int j = index; j > 1; j--)
 		{
-			this.memoryTracker[row][i] = this.memoryTracker[row][i - 1];
+			this.memoryTracker[row][j] = this.memoryTracker[row][j - 1];
 		}
+		
 		
 		this.memoryTracker[row][0] = recentlyUsed;
 	}
@@ -159,22 +186,18 @@ public class SimulationRunner {
 				return nextToBeReplaced;
 			}
 		}
-		return -1;
+		return 0;
 	}
  	
 	public int getRandomReplacement(){
 		int block = (int)Math.random() * (cache.getAssociativity());
-		if ( block == cache.getAssociativity())
-		{
-			System.out.println("Need to change getRandomReplacement");
-		}
 		return block;
 	}
 
 	public int getLRUReplacement(int row){
 
 		int blockToBeReplaced = this.memoryTracker[row][this.cache.getAssociativity() - 1];
-		int buffer;
+
 		// not optimal but to hurry up complete project we are going with it
 		for (int i = this.cache.getAssociativity() - 1; i > 1; i--)
 		{
@@ -198,23 +221,6 @@ public class SimulationRunner {
 		}
 		
 		return -1;
-		/*
-		int min = Integer.MAX_VALUE;
-		int blocksTracker[][];
-		for (int i = 0; i < cache.getAssociativity(); i++)
-		{
-			// pull from memory tracking array next index to be replaced.
-			for(int j = 0; j < row; j++)
-			{
-				if(memory[j][i] == 0)
-				{
-					return memory[j][i];
-				}
-			}
-		}
-		//return block needing to be replaced
-		return -1;
-		*/
 	}
 	
 	public void setMemory() {

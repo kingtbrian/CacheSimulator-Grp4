@@ -39,9 +39,7 @@ public class Instruction {
 				cache.getTagSizeBits(), 
 				cache.getTagSizeBits() + cache.getIndexSizeBits());
 		
-		System.out.println("row");
-		System.out.println(bits + " = " + this.bitsToInt(bits));
-		return 0;
+		return bitsToInt(bits);
 	}
 	
 	
@@ -52,18 +50,14 @@ public class Instruction {
 				0,
 				cache.getTagSizeBits());
 		
-		System.out.println("tag");
-		System.out.println(bits + " = " + this.bitsToInt(bits));
-		return 0;
+		return bitsToInt(bits);
 	}
 	
 	public int getOffsetOfAddress(Cache cache, String address)
 	{
 		String bits = this.addressToBits(address);
 		bits = bits.substring(cache.getTagSizeBits() + cache.getIndexSizeBits());
-		System.out.println("Offset");
-		System.out.println(bits + " = " + this.bitsToInt(bits));
-		return 0;
+		return bitsToInt(bits);
 	}
 	
 	public String addressToBits(String address)

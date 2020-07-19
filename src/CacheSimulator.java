@@ -8,11 +8,11 @@ public class CacheSimulator {
 		
 		String params[] = new String[] 
 				{
-					"-f", "TinyTrace.trc",
+					"-f", "A-10_new_1.5_a.pdf.trc",
 					"-s", "512",
 					"-b", "16",
 					"-a", "8",
-					"-r", "rnd"
+					"-r", "rr"
 				};
 		
 		FileOps fileOps = new FileOps(params);
@@ -20,6 +20,7 @@ public class CacheSimulator {
 		
 		// Milestone #1
 		SimulationRunner cacheSim = new SimulationRunner(cache, fileOps.loadInstructions());
+		cacheSim.runSimulation();
 		fileOps.printCacheSimToConsole(cache, cacheSim.getInstructions());
 	}
 	

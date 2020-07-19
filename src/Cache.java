@@ -9,18 +9,20 @@ public class Cache {
 	private int totalRows;
 	private int overheadSizeBytes;
 	private int implementationSizeKBytes;
-	private double cost;
 	private int totalAccesses;
 	private int hits;
 	private int totalMisses;
 	private int compulsoryMiss;
 	private int conflictMiss;
 	private int cycles;
+	private int instructionCount;
+	private double waste;
+	private double cost;
 	private double hitRate;
 	private double missRate;
 	private double cyclesPerInstruction;
 	private double unusedSpace; 
-	private double unusedBlocks;
+	private int unusedBlocks;
 	
 	public Cache(int cacheSize, int blockSize, int associativity, String replacementPolicy) {
 		try {
@@ -50,7 +52,7 @@ public class Cache {
 		v = String.format("%-30s", "Associativity:");
 		sb.append(v + this.getAssociativity() + "\n");
 		v = String.format("%-30s", "Replacement Policy:");
-		sb.append(v + this.getReplacementPolicy() + "\n\n\n");
+		sb.append(v + this.getReplacementPolicy() + "\n\n");
 		
 		sb.append("***** Cache Calculated Values *****\n");
 		v = String.format("%-30s", "Total # Blocks:");
@@ -68,7 +70,7 @@ public class Cache {
 		v = String.format("%-30s", "Cost:");
 		sb.append(v);
 		v = String.format("%.2f", this.getCost());
-		sb.append("$" + v + "\n");
+		sb.append("$" + v + "\n\n");
 		
 		sb.append("***** CACHE SIMULATION RESULTS *****\n");
 		v = String.format("%-30s", "Total Cache Accesses:");
@@ -80,17 +82,28 @@ public class Cache {
 		v = String.format("%-30s", "--- Compulsory Misses:");
 		sb.append(v + this.getCompulsoryMiss() + "\n");
 		v = String.format("%-30s", "--- Conflict Misses:");
-		sb.append(v + this.getConflictMiss() + "\n\n\n");
+		sb.append(v + this.getConflictMiss() + "\n\n");
 		
 		sb.append("***** ***** CACHE HIT & MISS RATE: ***** *****\n");
 		v = String.format("%-30s", "Hit Rate:");
-		sb.append(v + this.getHitRate() + "%\n");
+		sb.append(v);
+		v = String.format("%.2f", 100 * this.getHitRate());
+		sb.append(v + "%\n");
 		v = String.format("%-30s", "Miss Rate:");
-		sb.append(v + this.getMissRate() + "%\n");
+		sb.append(v);
+		v = String.format("%.2f", 100 * this.getMissRate());
+		sb.append(v + "%\n");
 		v = String.format("%-30s", "CPI:");
-		sb.append(v + this.getCyclesPerInstruction() + "Cycles/Instruction\n");
+		sb.append(v);
+		v = String.format("%.2f Cycles/Instruction\n",  this.getCyclesPerInstruction());
+		sb.append(v);
 		v = String.format("%-30s", "Unused Cache Space:");
-		sb.append(v + this.getUnusedSpace() + "\n");
+		sb.append(v);
+		v = String.format("%.2f KB / %.2f KB = %.2f%% Waste = $%.2f \n", this.getUnusedSpace(), 
+														   this.getKb(this.getImplementationSizeKBytes()) * 1.0,  
+														   100 * (this.getUnusedSpace() * 1.0/this.getKb(this.getImplementationSizeKBytes()) * 1.0),
+														   this.getWaste());
+		sb.append(v);
 		v = String.format("%-30s", "Unused Cache Blocks:");
 		sb.append(v + this.getUnusedBlocks() + "\n");
 		
@@ -245,8 +258,8 @@ public class Cache {
 		return totalAccesses;
 	}
 
-	public void setTotalAccesses(int totalAccesses) {
-		this.totalAccesses = Integer.sum(getHits(), getTotalMisses());
+	public void setTotalAccesses() {
+		this.totalAccesses = this.getHits() + getTotalMisses();
 	}
 
 	public int getHits() {
@@ -259,8 +272,8 @@ public class Cache {
 		return totalMisses;
 	}
 
-	public void setTotalMisses(int totalMisses) {
-		this.totalMisses = Integer.sum(getCompulsoryMiss(), getConflictMiss());
+	public void setTotalMisses() {
+		this.totalMisses = this.getCompulsoryMiss() + this.getConflictMiss();
 	}
 
 	public int getCompulsoryMiss() {
@@ -278,40 +291,73 @@ public class Cache {
 	public double getHitRate() {
 		return hitRate;
 	}
-	public void setHitRate(double hitRate) {
-		this.hitRate = hitRate;
+	public void setHitRate() {
+		this.hitRate = this.getHits() * 1.0 / this.getTotalAccesses();
 	}
 	public double getMissRate() {
 		return missRate;
 	}
-	public void setMissRate(double missRate) {
-		this.missRate = missRate;
+	public void setMissRate() {
+		this.missRate = this.getTotalMisses() * 1.0 / this.getTotalAccesses();
 	}
 	public double getCyclesPerInstruction() {
 		return cyclesPerInstruction;
 	}
-	public void setCyclesPerInstruction(double cyclesPerInstruction) {
-		this.cyclesPerInstruction = cyclesPerInstruction;
+	public void setCyclesPerInstruction() {
+		this.cyclesPerInstruction = this.getCycles() * 1.0 / this.getInstructionCount();
 	}
 	public double getUnusedSpace() {
 		return unusedSpace;
 	}
-	public void setUnusedSpace(double unusedSpace) {
-		this.unusedSpace = unusedSpace;
+	public void setUnusedSpace() {
+		this.unusedSpace = this.getKb((this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes))
+				- (this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes) - (this.getBlockSizeBytes() * this.getUnusedBlocks())));
 	}
-	public double getUnusedBlocks() {
+	public int getUnusedBlocks() {
 		return unusedBlocks;
 	}
-	public void setUnusedBlocks(double unusedBlocks) {
-		this.unusedBlocks = unusedBlocks;
+	
+	public void setWaste()
+	{
+		this.waste = .07 * this.getUnusedSpace();
 	}
 	
+	public double getWaste()
+	{
+		return this.waste;
+	}
 	public int getCycles() {
 		return cycles;
 	}
 
 	public void setCycles(int cycles) {
 		this.cycles = cycles;
+	}
+	
+	public void setInstructionCount(int instructionCount)
+	{
+		this.instructionCount = instructionCount;
+	}
+	
+	public int getInstructionCount()
+	{
+		return this.instructionCount;
+	}
+	
+	public void setUnusedBlocks(int n)
+	{
+		this.unusedBlocks = n;
+	}
+	
+	public void calculateCacheMetrics()
+	{
+		this.setTotalMisses();
+		this.setTotalAccesses();
+		this.setHitRate();
+		this.setMissRate();
+		this.setCyclesPerInstruction();
+		this.setUnusedSpace();
+		this.setWaste();
 	}
 	
 }
