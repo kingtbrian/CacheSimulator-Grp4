@@ -120,6 +120,13 @@ public class SimulationRunner {
 	{
 		for (int i = 0; i < cache.getAssociativity(); i++)
 		{
+			for(int j = 0; j < cache.getTotalRows(); j++)
+			{
+				if(i == index && j == row)
+				{
+					memory[j][i] = 0;
+				}
+			}
 			// logic to track recently used.
 		}
 	}
@@ -131,6 +138,13 @@ public class SimulationRunner {
 		for (int i = 0; i < cache.getAssociativity(); i++)
 		{
 			// pull from memory tracking array next index to be replaced.
+			for(int j = 0; j < row; j++)
+			{
+				if(memory[j][i] == 0)
+				{
+					return memory[j][i];
+				}
+			}
 		}
 		return -1;
 	}
