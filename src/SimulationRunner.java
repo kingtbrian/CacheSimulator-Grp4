@@ -120,18 +120,42 @@ public class SimulationRunner {
 	{
 		for (int i = 0; i < cache.getAssociativity(); i++)
 		{
+			for(int j = 0; j < cache.getTotalRows(); j++)
+			{
+				if(i == index && j == row)
+				{
+					memory[j][i] = 0;
+				}
+			}
 			// logic to track recently used.
 		}
 	}
-	
-	
+	public int getRoundRobin(int block){
+		//last block replaced + 1
+		return block + 1;
+	}
+	public int getRandomReplacement(int block){
+		block = (int)Math.random();
+		return block;
+	}
+	public int getLRU(int block){
+		//block least recently used
+		return block;
+	}
 	public int getReplacementBlock(int row)
 	{
 		int min = Integer.MAX_VALUE;
+		int blocksTracker[][];
 		for (int i = 0; i < cache.getAssociativity(); i++)
 		{
+			for(int j = 0; j < row; j++){
+				if( memoryTracker[j][i] == 0){
+					return memoryTracker[j][i];
+				}
+			}
 			// pull from memory tracking array next index to be replaced.
 		}
+		//return block needing to be replaced
 		return -1;
 	}
 	
