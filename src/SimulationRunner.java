@@ -27,7 +27,7 @@ public class SimulationRunner {
 	
 	public void runSimulation()
 	{
-		int addr[][] = new int[3][3];
+		int addr[][] = new int[3][4];
 		
 		while (!this.instructions.isEmpty()) 
 		{
@@ -47,79 +47,64 @@ public class SimulationRunner {
 			addr[SRC][HIT] = 0;
 			
 			
-			this.simDataAccess(addr[EIP], instruction);
-			this.simDataAccess(addr[DST], instruction);
-			this.simDataAccess(addr[SRC], instruction);
+			this.simDataAccess(addr[EIP], instruction, instruction.getReadLength());
+			
+			if (addr[DST][TAG] != 0 && addr[DST][ROW] !=0)
+				this.simDataAccess(addr[DST], instruction, 4);
+			
+			if (addr[SRC][TAG] != 0 && addr[SRC][ROW] !=0)
+				this.simDataAccess(addr[SRC], instruction, 4);
 
 		}
 	}
 	
-	public void simDataAccess(int address[], Instruction instruction)
+	public void simDataAccess(int i[], Instruction instruction, int bytesOfOperation)
 	{
-		int bytesOfOperation = instruction.getReadLength();
 		int availableBlock = -1; 
-
-		// Operation will not involve wrapping to more rows
-		if (bytesOfOperation + address[BYTE] <= cache.getBlockSizeBytes())
+		int totalNumRowAccesses = (bytesOfOperation + i[BYTE]) / cache.getBlockSizeBytes();
+		System.out.println("totalNumRowAccesses" + totalNumRowAccesses);
+		
+		for (int cacheRow = i[ROW]; cacheRow < totalNumRowAccesses + cacheRow; cacheRow++)
 		{
 			for (int block = 0; block < cache.getAssociativity(); block++)
 			{
-				if(memory[address[ROW]][block] == -1) {
+				if(memory[cacheRow][block] == -1) {
 					availableBlock = block;
 				}
 				
-				// Cache Hit - No Wrap
-				if (memory[address[ROW]][block] == address[TAG])
+				// Cache Hit 
+				if (memory[i[ROW]][block] == i[TAG])
 				{
 					// 1 for hit, 2 for instruction
-					address[HIT] = 1;
+					i[HIT] = 1;
 					cache.setHits(cache.getHits() + 3);
-					this.updateMemoryTracker(block, address[ROW]);
+					this.updateMemoryTracker(block, i[ROW]);
 					break;
 				}
-			}
-			
-			// Cache Miss - No Wrap
-			if (address[HIT] == 0)
+			}		
+			// Cache Miss 
+			if (i[HIT] == 0)
 			{
 				if (availableBlock >= 0)
 				{
-					memory[address[ROW]][availableBlock] = address[TAG];
+					memory[i[ROW]][availableBlock] = i[TAG];
 					// 4 * number reads needed + 2 for instruction
 					cache.setCompulsoryMiss(cache.getCompulsoryMiss() + 
 							(4 * this.getNumberOfReads()) + 2);
 				} 
 				else 
 				{
-					int replaceBlock = getReplacementBlock(address[ROW]);
-					memory[address[ROW]][replaceBlock] = address[TAG];
+					cache.setConflictMiss(cache.getConflictMiss() + 
+							(4 * this.getNumberOfReads()) + 2);
+					int replaceBlock = getReplacementBlock(i[ROW]);
+					memory[i[ROW]][replaceBlock] = i[TAG];
 				}
 			}
-			
+				
 			availableBlock = -1; 
 		}
-		else 
-		{
-			int iRows = ((bytesOfOperation + address[BYTE]) / cache.getBlockSizeBytes());
-			while(iRows != 0)
-			{
-				//process 1 row
-				iRows--;
-			}
-		}
-		// separate logic in case of multiple row accesses? can it be combined?
-		// What are the edge cases for multiple row access? 
-		// maybe this:
-		// for ( i = 0; 
-		//       i <  ((number of bytes for read/write instruction 
-		//			  + byte offset in address the instruction is accessing) 
-		//			  / cache block size);
-		// 		 i++)
-		// formula should produce the number of rows needing to be accessed? no more separate logic for wraps?
-					 
-					
 	}
-	
+		
 	public int getNumberOfReads() {
 		return (int)Math.ceil(cache.getBlockSizeBytes()/4);
 	}
