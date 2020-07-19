@@ -98,7 +98,15 @@ public class SimulationRunner {
 			
 			availableBlock = -1; 
 		}
-		
+		else 
+		{
+			int iRows = ((bytesOfOperation + address[BYTE]) / cache.getBlockSizeBytes());
+			while(iRows != 0)
+			{
+				//process 1 row
+				iRows--;
+			}
+		}
 		// separate logic in case of multiple row accesses? can it be combined?
 		// What are the edge cases for multiple row access? 
 		// maybe this:
@@ -154,6 +162,13 @@ public class SimulationRunner {
 				}
 			}
 			// pull from memory tracking array next index to be replaced.
+			for(int j = 0; j < row; j++)
+			{
+				if(memory[j][i] == 0)
+				{
+					return memory[j][i];
+				}
+			}
 		}
 		//return block needing to be replaced
 		return -1;

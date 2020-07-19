@@ -1,4 +1,3 @@
-
 public class Cache {
 	private int cacheSizeKBytes;
 	private int blockSizeBytes;
@@ -11,7 +10,9 @@ public class Cache {
 	private int overheadSizeBytes;
 	private int implementationSizeKBytes;
 	private double cost;
+	private int totalAccesses;
 	private int hits;
+	private int totalMisses;
 	private int compulsoryMiss;
 	private int conflictMiss;
 	private int cycles;
@@ -68,7 +69,30 @@ public class Cache {
 		sb.append(v);
 		v = String.format("%.2f", this.getCost());
 		sb.append("$" + v + "\n");
-
+		
+		sb.append("***** CACHE SIMULATION RESULTS *****\n");
+		v = String.format("%-30s", "Total Cache Accesses:");
+		sb.append(v + this.getTotalAccesses() + "\n");
+		v = String.format("%-30s", "Cache Hits:");
+		sb.append(v + this.getHits() + "\n");
+		v = String.format("%-30s", "Cache Misses:");
+		sb.append(v + this.getTotalMisses() + "\n");
+		v = String.format("%-30s", "--- Compulsory Misses:");
+		sb.append(v + this.getCompulsoryMiss() + "\n");
+		v = String.format("%-30s", "--- Conflict Misses:");
+		sb.append(v + this.getConflictMiss() + "\n\n\n");
+		
+		sb.append("***** ***** CACHE HIT & MISS RATE: ***** *****\n");
+		v = String.format("%-30s", "Hit Rate:");
+		sb.append(v + this.getHitRate() + "%\n");
+		v = String.format("%-30s", "Miss Rate:");
+		sb.append(v + this.getMissRate() + "%\n");
+		v = String.format("%-30s", "CPI:");
+		sb.append(v + this.getCyclesPerInstruction() + "Cycles/Instruction\n");
+		v = String.format("%-30s", "Unused Cache Space:");
+		sb.append(v + this.getUnusedSpace() + "\n");
+		v = String.format("%-30s", "Unused Cache Blocks:");
+		sb.append(v + this.getUnusedBlocks() + "\n");
 		
 		return sb.toString();
 	}
@@ -217,12 +241,28 @@ public class Cache {
 	public void setCost(double cost) {
 		this.cost = cost;
 	}
+	public int getTotalAccesses() {
+		return totalAccesses;
+	}
+
+	public void setTotalAccesses(int totalAccesses) {
+		this.totalAccesses = Integer.sum(getHits(), getTotalMisses());
+	}
+
 	public int getHits() {
 		return hits;
 	}
 	public void setHits(int hits) {
 		this.hits = hits;
 	}
+	public int getTotalMisses() {
+		return totalMisses;
+	}
+
+	public void setTotalMisses(int totalMisses) {
+		this.totalMisses = Integer.sum(getCompulsoryMiss(), getConflictMiss());
+	}
+
 	public int getCompulsoryMiss() {
 		return compulsoryMiss;
 	}
