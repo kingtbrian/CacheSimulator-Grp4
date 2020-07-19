@@ -156,11 +156,6 @@ public class SimulationRunner {
 		int blocksTracker[][];
 		for (int i = 0; i < cache.getAssociativity(); i++)
 		{
-			for(int j = 0; j < row; j++){
-				if( memoryTracker[j][i] == 0){
-					return memoryTracker[j][i];
-				}
-			}
 			// pull from memory tracking array next index to be replaced.
 			for(int j = 0; j < row; j++)
 			{
