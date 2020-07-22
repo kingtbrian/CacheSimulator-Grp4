@@ -314,18 +314,8 @@ public class Cache {
 		return unusedSpace;
 	}
 	public void setUnusedSpace() {
-		
-		this.unusedSpace = this.getKb(this.getUnusedBlocks() * this.getBlockSizeBytes() * 1.0);
-		/*
-		this.unusedSpace = (this.getNumBlocks() 
-									  - this.getCompulsoryMiss()) * 1.0 * (this.getBlockSizeBytes() 
-									  + this.getOverheadSizeBytes())/1024;	
-		*/
-			
-		/*
-		this.unusedSpace = this.getKb((this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes))
-				- (1.0 * this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes) - (this.getBlockSizeBytes() * this.getUnusedBlocks())));
-		*/
+		this.unusedSpace = this.getKb((this.getUnusedBlocks()) * ((this.getTagSizeBits())/8 + 1.0 + this.getBlockSizeBytes()));	
+	
 	}
 	public int getUnusedBlocks() {
 		return unusedBlocks;
