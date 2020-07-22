@@ -72,6 +72,7 @@ public class FileOps {
 				
 				length = Integer.parseInt(line.substring(5, 7));
 				address = line.substring(10, 18);
+				instructionSet.add(new Instruction(length, address));
 				
 				line = reader.readLine();
 				if (line != null) {
@@ -79,7 +80,13 @@ public class FileOps {
 					readDest = line.substring(33, 41);
 				} 
 				
-				instructionSet.add(new Instruction(length, address, writeDest, readDest));
+				if (!writeDest.equalsIgnoreCase("00000000")) {
+					instructionSet.add(new Instruction(4, writeDest));
+				}
+				if (!readDest.equalsIgnoreCase("00000000")) {
+					instructionSet.add(new Instruction(4, readDest));
+				}
+					
 				line = reader.readLine();
 			}
 
@@ -136,15 +143,6 @@ public class FileOps {
 			sb.append("Cache Simulator CS3853 Summer 2020 - Group #04\n\n");
 			sb.append("Trace File: " + this.traceFileName + "\n\n");
 			sb.append(cache.toString() + "\n\n");
-			
-			/*
-			for(Instruction i : instructions) {
-				if (addrCount < 20) {
-            		sb.append(i.toString() + "\n");
-				}
-				addrCount++;
-			}
-			*/
 			
 			instructions.stream()
             	.forEach(instruction -> {

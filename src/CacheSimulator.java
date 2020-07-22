@@ -8,9 +8,9 @@ public class CacheSimulator {
 		
 		String params[] = new String[] 
 				{
-					"-f", "A-10_new_1.5_a.pdf.trc",
-					"-s", "512",
-					"-b", "16",
+					"-f", "A-9_new_1.5.pdf.trc",
+					"-s", "128",
+					"-b", "4",
 					"-a", "8",
 					"-r", "rr"
 				};

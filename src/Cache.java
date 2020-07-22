@@ -124,6 +124,10 @@ public class Cache {
 		return (int)(n / (Math.pow(2, 10)) );
 	}
 	
+	public double getKb(double n)
+	{
+		return n / (Math.pow(2, 10));
+	}
 	public void calculateCost() {
 		this.setCost(
 				.07 * this.implementationSizeKBytes/(int)(Math.pow(2, 10))
@@ -310,8 +314,18 @@ public class Cache {
 		return unusedSpace;
 	}
 	public void setUnusedSpace() {
+		
+		this.unusedSpace = this.getKb(this.getUnusedBlocks() * this.getBlockSizeBytes() * 1.0);
+		/*
+		this.unusedSpace = (this.getNumBlocks() 
+									  - this.getCompulsoryMiss()) * 1.0 * (this.getBlockSizeBytes() 
+									  + this.getOverheadSizeBytes())/1024;	
+		*/
+			
+		/*
 		this.unusedSpace = this.getKb((this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes))
-				- (this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes) - (this.getBlockSizeBytes() * this.getUnusedBlocks())));
+				- (1.0 * this.getAssociativity() * this.getTotalRows() * (this.blockSizeBytes) - (this.getBlockSizeBytes() * this.getUnusedBlocks())));
+		*/
 	}
 	public int getUnusedBlocks() {
 		return unusedBlocks;

@@ -38,23 +38,8 @@ public class SimulationRunner {
 			addr[EIP][TAG] = instruction.getTagOfAddress(cache, instruction.getAddress());
 			addr[EIP][ROW] = instruction.getRowOfAddress(cache, instruction.getAddress());
 			addr[EIP][BYTE] = instruction.getOffsetOfAddress(cache, instruction.getAddress());
-			addr[EIP][HIT] = 0;
-			addr[DST][TAG] = instruction.getTagOfAddress(cache, instruction.getWriteDest());
-			addr[DST][ROW] = instruction.getRowOfAddress(cache, instruction.getWriteDest());
-			addr[DST][BYTE] = instruction.getOffsetOfAddress(cache, instruction.getWriteDest());
-			addr[DST][HIT] = 0;
-			addr[SRC][TAG] = instruction.getTagOfAddress(cache, instruction.getReadDest());
-			addr[SRC][ROW] = instruction.getRowOfAddress(cache, instruction.getReadDest());
-			addr[SRC][BYTE] = instruction.getOffsetOfAddress(cache, instruction.getReadDest());
-			addr[SRC][HIT] = 0;
-			
+
 			this.simDataAccess(addr[EIP], instruction, instruction.getReadLength());
-			
-			if (addr[DST][TAG] != 0 && addr[DST][ROW] !=0)
-				this.simDataAccess(addr[DST], instruction, 4);
-			
-			if (addr[SRC][TAG] != 0 && addr[SRC][ROW] !=0)
-				this.simDataAccess(addr[SRC], instruction, 4);
 
 		}
 	}
@@ -62,18 +47,33 @@ public class SimulationRunner {
 	public void simDataAccess(int i[], Instruction instruction, int bytesOfOperation)
 	{
 		int availableBlock = -1; 
-		int totalNumRowAccesses = ((bytesOfOperation + i[BYTE]) / cache.getBlockSizeBytes()) + 1;
+		int totalNumRowAccesses = 1;
+		int overWrap = 0; 
+		int cacheRow = 0;
+		
+		if ( bytesOfOperation + i[BYTE] > cache.getBlockSizeBytes() &&  (bytesOfOperation + i[BYTE]) % cache.getBlockSizeBytes() != 0)
+		{
+			totalNumRowAccesses = ((bytesOfOperation + i[BYTE]) / cache.getBlockSizeBytes()) + 1;
+		} 
+		else if (bytesOfOperation + i[BYTE] > cache.getBlockSizeBytes() &&  (bytesOfOperation + i[BYTE]) % cache.getBlockSizeBytes() == 0) 
+		{
+			totalNumRowAccesses = ((bytesOfOperation + i[BYTE]) / cache.getBlockSizeBytes());
+		}
 
 		for (int rowAccesses = i[ROW]; rowAccesses < (totalNumRowAccesses + i[ROW]); rowAccesses++)
 		{
-			int cacheRow = rowAccesses;
-			// ensure wrap around to beginning of cache if needed
-			if (cacheRow == cache.getTotalRows())
+			
+			if ( rowAccesses >= this.cache.getTotalRows())
 			{
-				cacheRow = 0;
+				cacheRow = overWrap++; 
+			} 
+			else 
+			{
+				cacheRow = rowAccesses;
 			}
 			
-			for (int block = 0; block < cache.getAssociativity(); block++)
+			int block = 0;
+			while (block < cache.getAssociativity() && i[HIT] != 1)
 			{
 				if(memory[cacheRow][block] == -1) {
 					availableBlock = block;
@@ -82,16 +82,17 @@ public class SimulationRunner {
 				if (memory[cacheRow][block] == i[TAG])
 				{
 					// 1 for hit, 2 for instruction
-					i[HIT] = 1;	
 					cache.setHits(cache.getHits() + 1);
 					cache.setCycles(cache.getCycles() + 3);
 					if (cache.getReplacementPolicy().equalsIgnoreCase("Least Recently Used"))
 					{
 						this.updateLRUTracker(block, cacheRow);
 					}
-					break;
+					i[HIT] = 1;	
 				}
-			}		
+				block++;
+			}
+				
 			// Cache Miss 
 			if (i[HIT] == 0)
 			{
@@ -112,10 +113,17 @@ public class SimulationRunner {
 			}
 			// account for new byte offset after operation
 			// unneeded if there are no wraps
-			i[BYTE] = (i[BYTE] + bytesOfOperation) % cache.getBlockSizeBytes();
-				
+			if (totalNumRowAccesses > 1)
+			{
+				int buff = i[BYTE];
+				i[BYTE] = (i[BYTE] + bytesOfOperation) % cache.getBlockSizeBytes();
+				bytesOfOperation = (buff + bytesOfOperation) - cache.getBlockSizeBytes();
+			}
+			
+			i[HIT] = 0;	
 			availableBlock = -1; 
 		}
+		
 		this.cache.setUnusedBlocks(this.findUnusedBlocks());
 		this.cache.calculateCacheMetrics();
 	}
